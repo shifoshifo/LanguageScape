@@ -36,6 +36,10 @@ public class LanguageScapePlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
+	// Vocabulary lookup system
+	private final VocabularyService vocabularyService =
+			new VocabularyService();
+
 	// Stores the quantities from the previous inventory update.
 	private Map<Integer, Integer> previousInventory = null;
 
@@ -113,20 +117,32 @@ public class LanguageScapePlugin extends Plugin
 
 				int gained = currentQuantity - previousQuantity;
 
+
 				if (gained > 0)
 				{
 					String itemName = itemManager
 							.getItemComposition(itemId)
 							.getName();
 
-					client.addChatMessage(
-							ChatMessageType.GAMEMESSAGE,
-							"",
-							"LanguageScape detected: "
-									+ gained + " x " + itemName,
-							null
-					);
+					VocabularyService.VocabularyEntry word =
+							vocabularyService.findWord(itemName);
+
+					if (word != null)
+					{
+						String message =
+								"LanguageScape | " + itemName
+										+ " | Spanish: " + word.spanish
+										+ " | Arabic: " + word.transliteration;
+
+						client.addChatMessage(
+								ChatMessageType.GAMEMESSAGE,
+								"",
+								message,
+								null
+						);
+					}
 				}
+
 			}
 		}
 
